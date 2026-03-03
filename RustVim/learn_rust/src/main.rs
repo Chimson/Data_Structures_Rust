@@ -155,7 +155,7 @@ fn main() {
   }
   println!("{}", a);    // a is still alive
 
-  // borrow by ref/slice, Copy on ref
+  // borrow by ref/slice, Copy on ref is the same as borrow
   // prints refs and vals, print auto derefs to vals, can use deref *
   // AI says this is the fastest iterator?
   for a in &arr {                         // can drop & for vals only
@@ -260,13 +260,27 @@ fn main() {
   // call on mutable array ref
   let arr2ref:&mut [usize] = null_out(&mut arr2);     
   println!("{:?}", arr2ref);
-
   for v in &mut *arr2ref {
     *v = 1;
   }
   println!("{:?}", arr2ref);
   null_out_ind(arr2ref, 0);
-  println!("{:?}", arr2ref)
+  println!("{:?}", arr2ref);
 
-  // STOPPED ON FUNCTIONS
+  // function that Moves on Move type
+  let mv:String = String::from("move this");
+  mymove(mv);
+  // println!("{mv}");    // string has been moved
+
+  // placeholder function to implement later
+  donothing(10);
+  
+  
+
+
+  // STOPPED ON AFTER FUNCTION
+  // TODO: understand RC pointers
+  //       Some and None as a replacement of null
+  //         also has build in handlers, like if let
+  //       loop keyword, like recursion without overhead  
 }
