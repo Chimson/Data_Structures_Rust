@@ -71,6 +71,9 @@ QuickRef:
     to end mark, can add command after it 
   "%:s/from/to/c" asks to change all "from" to "to" 
   ":LspRestart" restarts all lsp servers  
+  ":e!" forces an edit, like a hard reload of the current file
+  "ww" in Normal mode is now mapped to switch windows
+  "jj" is now mapped to go from Insert to Normal mode
 
   RUST ANALYZER
   "shift-L" display error message from underline

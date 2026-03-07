@@ -24,7 +24,7 @@
         isize, usize for size of machine word
 */
 
-mod lib_one;  // declared for this main crate
+mod lib_one;   // declared for this main crate
 
 // make lib_one code easier to call
 use crate::lib_one::*;    // add on ::func for specific function/classes etc.
@@ -197,6 +197,7 @@ fn main() {
   // also an index based loop
   // buf is a ref to that holds the pointer to the array on the heap
   // autoderefs the ref to the location on stack, no need for *, impl Deref
+  // ..=
   const N:usize = 10;
   let mut buf:Box<[isize; N]> = 
     Box::<[isize; N]>::new([0; N]);       // don't need rhs [isize;N] 
@@ -247,6 +248,7 @@ fn main() {
   println!("{y}");    // 2
   
   // pattern matching on arrays, _ is wildcard
+  // can match on Some/None (Option) or Err/Ok (Result)
   let mut arr2:[usize;10] = [0;10];
   for i in 1..10 {
     arr2[i] = i + arr2[i - 1];
@@ -274,13 +276,56 @@ fn main() {
 
   // placeholder function to implement later
   donothing(10);
-  
-  
+ 
+  // loop block that returns with a break
+  // return is assigned to let var statement 
+  // continue can also be used
+  println!("{:?}", arr);
+  let mut i:usize = 0;
+  let cnt:usize = loop {
+    if i >= arr.len() {
+      break i;
+    }
+    arr[i] += 1;
+    i += 1;
+  };
+  println!("{:?} has count {}", arr, cnt);
 
 
-  // STOPPED ON AFTER FUNCTION
+  // Option<T> is Some(T) or None, Rust's null replacement
+  // handle by using if let or unwrap_or
+  // can handle by pattern match and many other methods, some panic on None
+  // unwrap_or(0) returns val from Some(val) or 0 on None 
+  // works on any Enum include Ok/Err (Result)
+  let oarr: [Option<isize>; 5] = [Some(1), None, Some(3), None, Some(5)];
+  for o in oarr {
+    if let Some(v) = o {
+      println!("if let got: {v}");
+    }
+    else {
+      println!("hit None");
+    }
+  }
+  for o in oarr {
+    let v: isize = o.unwrap_or(0);
+    println!("unwrap_or got: {v}");
+  }
+
+  // while let loops as long as pattern matches Some(v)
+  // loops until extract None on wval after last iteration
+  // if expression can be transformed into an assignment
+  let mut wval: Option<isize> = Some(3);
+  while let Some(v) = wval {
+    println!("while let got: {v}");
+    wval = 
+      if v > 0 { 
+        Some(v - 1) 
+      } 
+      else { 
+        None 
+      };
+  }
+
+  // STOPPED ON MOVE/COPY partially through it
   // TODO: understand RC pointers
-  //       Some and None as a replacement of null
-  //         also has build in handlers, like if let
-  //       loop keyword, like recursion without overhead  
 }
