@@ -133,6 +133,12 @@ fn main() {
   *ival2 = 13;
   // ival = ival2;                 // cannot have two mut& refs
   // println!("{ival}, {ival2}");  // triggers the error on prev line
+
+  // once &mut or & is declared, any older refs are now invalid 
+  //   no matter if they are & or &mut
+  // Any & declared after &mut invalidates the &mut    
+  // TODO
+
  
   // now ival points to ival2, as long as ival2 has no read/write again 
   ival = ival2;           
@@ -191,6 +197,14 @@ fn main() {
     println!("{s}");
   }
   // println!("{:?}", sarr);  // sarr Move out, so panics
+
+  // Move types, when borrowed with &, will not move 
+  let nm:String = String::from("Will");
+  // let mm:String = nm;   // mving does not allow next borrow 
+  let nmref:&String = &nm; 
+  let nmref2:&String = nmref;
+  println!("{nm}, {nmref2}");
+  
 
   // allocate on the heap with box, initialized (can pick uninit in unsafe{})
   // give new() an array initializer
@@ -326,6 +340,20 @@ fn main() {
       };
   }
 
-  // STOPPED ON MOVE/COPY partially through it
-  // TODO: understand RC pointers
-}
+  // move String from st, change it,  back to st
+  let mut st = String::from("hello");
+  st = change(st);
+  println!("{st}");
+
+  // function modifies Move type, by borrow/Copy ref
+  // add_last borrow st3, so it is not moved
+  let mut st3:String = String::from("Ben");
+  add_last(&mut st3);
+  println!("{st3}");
+  
+  // STOPPED ON REFERENCE/BORROW
+  // TODO: do the TODO above with &mut invalidation
+  //       understand RC pointers
+  //       struct with a Move type in a field 
+  //         on move, can destroy the object
+} 

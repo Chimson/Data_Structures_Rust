@@ -29,6 +29,19 @@ pub fn mymove(msg:String) {
   println!("{msg}");
 }
 
+// can return a Move type to another var, or back to old
+pub fn change(s:String) -> String {
+  s + " world"
+}
+
+// to modify Move type, need to use mutable reference
+// not enough to make the variable mut
+// do not need to remove, since its not moved
+//   borrowed by ref
+pub fn add_last(first:&mut String) {
+  first.push_str(" Harki");
+}
+
 // set up functions to implement later
 // attributes suppress warnings 
 #[allow(unused_variables)]
