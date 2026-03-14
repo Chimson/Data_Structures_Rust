@@ -91,6 +91,7 @@ fn main() {
   // String is mutable, data allocated to the heap, like Vec<u8>
   // ref is like a struct of pointer, capacity, length on stack
   // :: namespace operator
+  // == always derefs to vals, no matter the & or * aritmetic
   let mut s = String::from("Ben");
   let s2 = String::from("Mags");
   s.push_str(" Harki");        // has methods
@@ -134,15 +135,26 @@ fn main() {
   // ival = ival2;                 // cannot have two mut& refs
   // println!("{ival}, {ival2}");  // triggers the error on prev line
 
-  // once &mut or & is declared, any older refs are now invalid 
-  //   no matter if they are & or &mut
-  // Any & declared after &mut invalidates the &mut    
-  // TODO
-
- 
   // now ival points to ival2, as long as ival2 has no read/write again 
   ival = ival2;           
   println!("{ival}");
+
+  // once &mut is declared, any older refs are now invalid 
+  //   no matter if they are & or &mut
+  // Any & declared after &mut invalidates the &mut    
+  let mut mval:isize = 10;
+  #[allow(unused_variables)]  
+  let rval:&isize = &mval;
+  #[allow(unused_variables)]  
+  let rmval:&mut isize = &mut mval;
+  // println!("{rval}");      // previous is invalid
+  #[allow(unused_variables)]  
+  let rmval2:&mut isize = &mut mval;
+  // println!("{rmval}");     // previous is invalid
+  let rval2:&isize = &mval;
+  // println!("{rmval2}");    // previous is invalid
+  println!("{rval2}");
+  
 
   // can have any number of shared reference, since readonly
   let ival3:&isize = &14;
@@ -198,20 +210,25 @@ fn main() {
   }
   // println!("{:?}", sarr);  // sarr Move out, so panics
 
-  // Move types, when borrowed with &, will not move 
+  // Move types, when borrowed with &, will not move
   let nm:String = String::from("Will");
   // let mm:String = nm;   // mving does not allow next borrow 
   let nmref:&String = &nm; 
   let nmref2:&String = nmref;
   println!("{nm}, {nmref2}");
   
+  // .clone may help with Move types, deep copy
+  // technically a &, immutable borrow, refs always Copy
+  let mm:String = nm.clone();
+  println!("{nm}, {mm}");    // nm is not invalid
+
 
   // allocate on the heap with box, initialized (can pick uninit in unsafe{})
   // give new() an array initializer
   // also an index based loop
   // buf is a ref to that holds the pointer to the array on the heap
   // autoderefs the ref to the location on stack, no need for *, impl Deref
-  // ..=
+  // 0..=10 includes 10, 0.. goes to the end 
   const N:usize = 10;
   let mut buf:Box<[isize; N]> = 
     Box::<[isize; N]>::new([0; N]);       // don't need rhs [isize;N] 
@@ -351,9 +368,19 @@ fn main() {
   add_last(&mut st3);
   println!("{st3}");
   
+  // slice can use 0..10 ranges
+  // String can implicitly convert (coerce) to &str  
+  // adding a & or &mut to a contiguous type makes it a slice
+  let myname:String = String::from("Ben Harki");
+  println!("{}", &myname[4..]);
+
+
   // STOPPED ON REFERENCE/BORROW
-  // TODO: do the TODO above with &mut invalidation
+  // TODO:  
   //       understand RC pointers
   //       struct with a Move type in a field 
   //         on move, can destroy the object
+  //       famous lifetime example: ref in outer {}
+  //         assign val in inner{} fails in rust
+  //         can fix with a box, or mut var in outer
 } 

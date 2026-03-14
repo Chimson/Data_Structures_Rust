@@ -42,6 +42,14 @@ pub fn add_last(first:&mut String) {
   first.push_str(" Harki");
 }
 
+// cannot return any local var ref bc dropped from stk
+// fix by accepting a ref and passing it through, using a box, 
+//   or pass by value
+// pub fn dangle() -> &isize {
+  // let val:isize = 10;
+  // return &val;
+// }
+
 // set up functions to implement later
 // attributes suppress warnings 
 #[allow(unused_variables)]
