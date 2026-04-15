@@ -322,7 +322,6 @@ fn main() {
   };
   println!("{:?} has count {}", arr, cnt);
 
-
   // Option<T> is Some(T) or None, Rust's null replacement
   // handle by using if let or unwrap_or
   // can handle by pattern match and many other methods, some panic on None
