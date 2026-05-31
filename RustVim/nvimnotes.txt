@@ -6,6 +6,7 @@ Start:
 QuickRef:
   "Esc" back to Normal  
   "i" switches to Insert at left of cursor, "a" at right 
+    I made "a" "i"
   "I" starts insert at beginning of the line, 
   "A" starts insert after moving the cursor to the end of the line
   "dd" deletes a line, d in Visual mode deletes selection
@@ -54,6 +55,15 @@ QuickRef:
     ":Rex" return to/from program
     "R" rename file, dir
     "v" opens file in right vsplit
+    "<ctrl-l>" refresh netwr file list
+    "mb" makes current dir a bookmark
+    "4mB" deletes bookmark 4
+    "gb" goes back to recent bookmark, 4gb goes to bookmark 4
+    "qb" query bookmark list
+    "u" goes back through history dirs
+    "U" goes forward
+    "p" opens the file on the right to that netrw path at the top 
+      (check it first or it will open a new file)
   ":browse oldfiles", but the selection doesn't work right
   ":tabedit newfile.txt" adds a tab, can use mouse for new tabs, close them
     can use :tab prefix with other commands 
@@ -82,9 +92,11 @@ QuickRef:
   "%:s/from/to/c" asks to change all "from" to "to" 
   ":LspRestart" restarts all lsp servers  
   ":e!" forces an edit, like a hard reload of the current file
-  "ww" in Normal mode is now mapped to switch windows
-  "jj" is now mapped to go from Insert to Normal mode
+  "F12" in Normal mode is now mapped to switch windows
+  "F10" switches tabs
+  "jk" is now mapped to go from Insert to Normal mode
   "gc" will comment/uncomment lines in selections in Visual mode
+  "4G" moves to the 4th line in the file
   
 
   RUST ANALYZER
@@ -92,6 +104,7 @@ QuickRef:
     I added this in init.luai
   "shift-H" hover rust-analyzer info
   "Ctrl-x, "Ctrl-o" in Insert is text completion 
+    mapped this to II in insert mode
   just use Mason next time to install
     had to reorder the init.lua file so autocommands above
       for the analyzer were first, so they'd take
@@ -126,7 +139,6 @@ QuickRef:
   "tx" finds the next x in one line, but one char before
   "Fx" finds previous x in the line
   "Tx" finds the previous x in the line but one char before
-  "4G" moves to the 4th line in the file
   "50%" goes halfway through the file
   "H", "M", "L" is high mid low of visible lines
   ":set number" adds numbers to the lines

@@ -1,0 +1,12 @@
+[package]
+name = "learn_rust_exec"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+learn_rust_lib = { version = "0.1.0", path = "../learn_rust_lib" }
+
+# For seperately compilable binaries
+[[bin]]
+name = "otherexec"
+path = "src/bin/otherexec.rs"
