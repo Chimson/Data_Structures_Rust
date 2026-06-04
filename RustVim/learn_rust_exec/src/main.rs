@@ -51,6 +51,7 @@ Arrays take on the Copy or Move of the type they are an array of
 use std::convert::TryFrom;
 use std::rc::Rc;
 
+
 // "use" makes members from modules easier to call
 // pathed as:
 //   use crate::module_as_folder::...::module_as_file::public_member;
@@ -58,8 +59,12 @@ use std::rc::Rc;
 //   can stop at any module for use statement; adds namespace prefixes when used
 // can either add members individually or take off lib_one and add module prefixed
 use learn_rust_lib::lib_one::*;   
-use learn_rust_lib::entities::player::Player;
 use learn_rust_lib::entities::visibility;   // contains Enemy
+use learn_rust_lib::entities::player::*;
+// use learn_rust_lib::entities::player::Player;
+// use learn_rust_lib::entities::player::GenericPlayer;
+// use learn_rust_lib::entities::player::Health;
+// use learn_rust_lib::entities::player::TraitPlayer;
 
 fn main() { 
 
@@ -106,7 +111,9 @@ fn main() {
   // ref on stack, uses slice
   // s is a ref to str, &s is a ref to the ref
   // can't deref &str since the size of the str is unknown
-  // may have static lifetime: &`static str
+  // &str is the default read only string literal type
+  //   &mut str is unsafe but sometimes possible, not used often
+  // may have static lifetime: &`static str for full duration of program
   let s:&str = "Ben";
   println!("{s}");      // fmat string auto deref and prnts value 
   println!("{s:p}");    // prints rf info
@@ -118,7 +125,9 @@ fn main() {
   println!("{xref:p}, {:p}", xref);   // prints refs two ways
   println!("{:p}", &x);               // only way to print ref by temp val 
   println!("{}", *xref);              // only way to print val by temp deref
-  
+  // generally only deref on move types when moving out containing value
+  // like Box<>
+
   // String is mutable, data allocated to the heap, like Vec<u8>
   // ref is like a struct of pointer, capacity, length on stack
   // :: namespace operator
@@ -359,6 +368,7 @@ fn main() {
   // can handle by pattern match and many other methods, some panic on None
   // unwrap_or(0) returns val from Some(val) or 0 on None 
   // works on any Enum include Ok/Err (Result)
+  // ?, in a function, propgates the None, or Err back up form calling code (not shown)
   let oarr: [Option<isize>; 5] = [Some(1), None, Some(3), None, Some(5)];
   for o in oarr {
     if let Some(v) = o {
@@ -372,6 +382,7 @@ fn main() {
     let v: isize = o.unwrap_or(0);
     println!("unwrap_or got: {v}");
   }
+
 
   // while let loops as long as pattern matches Some(v)
   // loops until extract None on wval after last iteration
@@ -399,7 +410,7 @@ fn main() {
   add_last(&mut st3);
   println!("{st3}");
   
-  // slice can use 0..10 ranges
+  // slice can use 0..10 ranges, always through a & borrow
   // String can implicitly convert (coerce) to &str  
   // adding a & or &mut to a contiguous type makes it a slice
   let myname:String = String::from("Ben Harki");
@@ -473,11 +484,35 @@ fn main() {
   p6.get_name();
   // p6.set_name(String::from("X"));    
 
-  // TODO: ENUM
-  //       famous lifetime example: ref in outer {}
-  //         assign val in inner{} fails in rust
-  //         can fix with a box, or mut var in outer
-  //      traits and interface coding
-  //      generics
+  // demo generic trait bound
+  let mut g: GenericPlayer<Health> = 
+    GenericPlayer::new(Health::new(100));
+  g.heal(10);
+  
+  // demo on the &impl version of generics
+  g.trait_heal(&Health::new(100));
+  println!("{g}");
+
+  // dynamic dispatch demo coded to the Trait
+  // 
+  let tp: TraitPlayer = 
+    TraitPlayer::new(
+      Box::new(
+        Health::new(100)));
+  
+  println!("{}", tp.get().get());   // not great code, but demos the dyn type
+  
+  let mut h: Health = Health::new(100);
+  let mut r: RefPlayer = RefPlayer::new(&mut h);
+  let mut h2: Health = h;
+  // r.get_health(); violates the lifetime contract since h is dropped
+  
+  // two lifetimes example, elison rules does not cover
+  let tl: TwoLifetimes = TwoLifetimes::new("Ben", "Harki");
+  tl.print_strs();
+
+  // TODO:     
+  //      when do you need two named lifetimes
   //      macros
+  //      unsafe blocks
 } 

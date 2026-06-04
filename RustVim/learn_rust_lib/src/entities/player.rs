@@ -75,6 +75,190 @@ impl Player {
   }
 }
 
+// enums restrict to given constant possibilities
+// each choice can wrap a tuple, have fields, or neither, and mixed
+// useful for pattern matching
+// Move type by default
+// can implement traits, methods, etc.
+pub enum PlayerMode {
+  Enhanced(usize),
+  Default(usize),
+  Dead
+}
 
+pub fn get_val_from_status(mode: &PlayerMode) -> usize {
+  match *mode {
+    PlayerMode::Enhanced(v) => v,
+    PlayerMode::Default(v) => v,
+    PlayerMode::Dead => 0
+  }  
+}
+
+// static dispatch
+// can force a generic type to implement multiple traits with +
+// pub struct GenericPlayer<H: Healable + Attackable>
+// where clauses can be easier to read for adding more trait bounds
+// generics help polymorphism at the type level
+pub struct GenericPlayer<H : Healable> {
+  health: H  // by generic param
+}
+
+// need <H: Healable> to flag that H is generic and not concrete
+impl<H: Healable> GenericPlayer<H> {
+  pub fn new(health: H) -> Self {
+    Self {health}
+  }
+  
+  // &impl uses generics but reduces the syntax
+  // probably wouldn't normally mix the H and Healable normally, but just wanted a demo
+  // can similarily add more bounds on the trait
+  // pub fn trait_heal(&mut self, health: &impl Healable + Attackable) {i
+  pub fn trait_heal(&mut self, health: &impl Healable) {
+    self.heal(health.get());
+  }
+
+
+  pub fn heal(&mut self, amnt: usize) {
+    self.health.heal(amnt);
+  }
+}
+
+// can borrow T: &H
+pub fn borrow_generic<H: Healable>(health: &H) -> usize {
+  health.get()
+}
+
+impl<H: Healable> Display for GenericPlayer<H> {
+  fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+    write!(f, 
+      "GenericPlayer {{health: {}}}", self.health.get())
+  }
+}
+
+pub trait Healable {
+  fn heal(&mut self, amt: usize);
+  fn get(&self) -> usize;
+}
+
+pub struct Health {
+  health: usize
+}
+
+impl Health {
+  pub fn new(health: usize) -> Self {
+    Self {health}
+  }
+}
+
+impl Healable for Health {
+  fn heal(&mut self, amt: usize) {
+    self.health += amt;
+  }
+
+  fn get(&self) -> usize {
+    self.health
+  }
+}
+
+// by trait type, using dynamic dispatch
+// dyn means that the type is known at run time, so the size is not
+// Sized trait is not implemented
+// need to put it behind a reference &dyn to borrow, or in a Box that owns it
+//   Box is allocated on the heap so it resolves the size conflict
+// trait references help with polymorphism at the object level
+pub struct TraitPlayer {
+  health: Box<dyn Healable>    // like a reference to an abstract type
+}
+
+impl TraitPlayer {
+  pub fn new(health: Box<dyn Healable>) -> Self {
+    Self {health}
+  }
+
+  pub fn get(&self) -> &dyn Healable {     // also &mut dyn Healable is possible
+    &*self.health
+  }
+}
+
+pub trait Attackable {
+  fn take_damage(&mut self, amnt: usize);
+}
+
+pub struct AttackedPlayer {
+  health: usize
+} 
+
+impl Attackable for AttackedPlayer {
+  fn take_damage(&mut self, amnt: usize) {
+    self.health -= amnt;
+  }
+}
+
+// simulates inheritance
+trait PlayerBehaviors: Attackable + Healable {}
+
+struct FullPlayer {
+  health: usize
+}
+
+impl Attackable for FullPlayer {
+  fn take_damage(&mut self, amnt: usize) {
+    // fill in the implementation here
+  }
+}
+
+impl Healable for FullPlayer {
+  fn heal(&mut self, amt: usize) {
+    // fill in the implementation here
+  }
+  fn get(&self) -> usize {
+    // fill in the implementation here
+    0
+  }
+}
+
+impl PlayerBehaviors for FullPlayer {}
+
+// references require a lifetime generic parameter
+  // enums, traits, and functions can require them
+// struct declares that the Healable ref must live at least as long as the struct
+// can't have the borrow dropped by the owner while struct object still lives
+// struct RefPlayer<'a, T> for another generic parameter
+// cannot use '_ lifetime (any lifetime) here since they need to match
+pub struct RefPlayer<'a> {
+  health: &'a mut dyn Healable
+}
+
+impl<'a> RefPlayer<'a> { 
+  pub fn new(health: &'a mut dyn Healable) -> Self {
+    Self {health}
+  } 
+
+  // no need to add lifetime here bc of lifetime elison rules
+  // basically it is assumed that the output should live as long as self
+  pub fn get_health(&'a mut self) -> &'a mut dyn Healable {
+    self.health
+  }
+}
+
+// possible (likely) that the two references could have seperate lifetimes
+// could be the same too
+// functions with two lifetime params tend to follow elison rules where they
+//   are unnecessary
+pub struct TwoLifetimes<'a, 'b> {
+  r1: &'a str,
+  r2: &'b str
+}
+
+impl<'a, 'b> TwoLifetimes<'a, 'b> {
+  pub fn new(r1: &'a str, r2:&'b str) -> Self {
+    Self {r1, r2}
+  }
+
+  pub fn print_strs(&self) {
+    println!("{}, {}", self.r1, self.r2);
+  }
+
+}
 
 
