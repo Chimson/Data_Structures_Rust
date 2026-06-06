@@ -66,6 +66,8 @@ use learn_rust_lib::entities::player::*;
 // use learn_rust_lib::entities::player::Health;
 // use learn_rust_lib::entities::player::TraitPlayer;
 
+use learn_rust_lib::refresh;   // macros push to the root module
+
 fn main() { 
 
   // test initial exec and lib crates
@@ -532,17 +534,29 @@ fn main() {
   *char_ptr = 0x43;
   println!("{}", name);
 
+  // macro_rules! declarative macros are pattern matching based
+  // Not shown:
+  //   procedural macros can also parse Rust expressions, syntax, etc.
+  //   includes function like, derive, and attribute versions
+  // simplify above example the refresh &mut ref with macro
+  refresh!(char_ptr, name);
+  println!("{}", name);
+
   // unsafe with raw pointers
   // uses raw pointers
+  // also the *const u8 type (not shown)
   let mut name: String = String::from("Ben");
   let mut name_ptr: *mut u8 = name.as_mut_ptr();
   unsafe {
     *name_ptr += 1;
     name_ptr = name_ptr.add(1);
     *name_ptr += 1;
+    name_ptr = std::ptr::null_mut();   // null pointer
   } 
   println!("{}", name);
-
-  // TODO:     
-  //      macros
+  
 } 
+
+
+
+

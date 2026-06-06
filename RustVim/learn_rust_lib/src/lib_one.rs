@@ -58,6 +58,16 @@ pub fn donothing(i:usize) {
   // implement later
 }
 
+// macro to take the first &mut u8 to a [u8] and print all the bytes as UTF-8
+// make the => body {{ }} to ensure a new scope for the body to operate in (not shown) (hygenic)
+// identifiers may be automatically hygenic even if you use { } in => body
+
+#[macro_export]
+macro_rules! refresh {
+  ($i:ident, $j:ident) => {{
+    let $i: &mut u8 = unsafe {&mut ($j.as_bytes_mut()[0])};
+  }};
+}
 
 
 
