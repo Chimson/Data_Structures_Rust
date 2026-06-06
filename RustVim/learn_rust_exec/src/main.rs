@@ -112,6 +112,7 @@ fn main() {
   // s is a ref to str, &s is a ref to the ref
   // can't deref &str since the size of the str is unknown
   // &str is the default read only string literal type
+  //   encoded in UTF-8 uses 1-4 u8 values per character
   //   &mut str is unsafe but sometimes possible, not used often
   // may have static lifetime: &`static str for full duration of program
   let s:&str = "Ben";
@@ -196,7 +197,9 @@ fn main() {
   println!("{rval2}");
   
 
-  // can have any number of shared reference, since readonly
+  // can have any number of shared reference, since readonly 
+  // once a &mut ref is introduced its more complicated 
+  //   (shown in later examples but not here)                  
   let ival3:&isize = &14;
   let ival4:&isize = ival3;
   let ival5:&isize = ival4;
@@ -456,7 +459,8 @@ fn main() {
   p4.get_name();
   
   // rust suggests to borrow T directly from Box<T>
-  // can have any number of immut borrow, only one mutable borrow
+
+
   let p4ref: &Player = &p4;    // auto deref
   p4ref.get_name();
 
@@ -511,8 +515,34 @@ fn main() {
   let tl: TwoLifetimes = TwoLifetimes::new("Ben", "Harki");
   tl.print_strs();
 
+  // small unsafe operation, without raw pointers
+  // &str is a slice to UTF-8 slice, where each character is represented by
+  //   1-4 u8 vals
+  // you can have any number of immutable borrows except ...
+  //   that once a mutable borrow is alive you can't have ..
+  //   any more new mutable or new immutable borrows     
+  // one fix is to hide/drop the old borrows and create new ones each time, 
+  //   which you could write in a function? 
+  // another fix is to clone name if you have the resources
+  let mut name: String = String::from("Ben");
+  let char_ptr: &mut u8 = unsafe {&mut (name.as_bytes_mut()[0])};
+  *char_ptr = 0x43;
+  println!("{:?}", name);
+  let char_ptr: &mut u8 = unsafe {&mut (name.as_bytes_mut()[0])}; 
+  *char_ptr = 0x43;
+  println!("{}", name);
+
+  // unsafe with raw pointers
+  // uses raw pointers
+  let mut name: String = String::from("Ben");
+  let mut name_ptr: *mut u8 = name.as_mut_ptr();
+  unsafe {
+    *name_ptr += 1;
+    name_ptr = name_ptr.add(1);
+    *name_ptr += 1;
+  } 
+  println!("{}", name);
+
   // TODO:     
-  //      when do you need two named lifetimes
   //      macros
-  //      unsafe blocks
 } 
